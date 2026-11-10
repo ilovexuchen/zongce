@@ -4,9 +4,11 @@
 
 **活动、评分、目录授权和证据照片留在本机；GitHub只托管程序与公开规则资料。分数为预估，最终以学院认定为准。**
 
-- 在线使用：https://genshinstartmoonlight.github.io/zongce-planner/
-- 源码仓库：https://github.com/genshinstartmoonlight/zongce-planner
-- 部署记录：https://github.com/genshinstartmoonlight/zongce-planner/actions
+- 网页发布地址（启用 Pages 并部署成功后）：https://ilovexuchen.github.io/zongce/
+- 源码仓库：https://github.com/ilovexuchen/zongce
+- 部署任务：https://github.com/ilovexuchen/zongce/actions
+
+本副本保留原项目提交历史和 `codex/zongce-planner` 分支。首次发布见[迁移部署说明](./迁移部署说明.md)。历史部署文档记录的是原账号的旧站，不能作为新站已上线的证明。
 
 ## 使用
 
@@ -50,7 +52,8 @@ GitHub仓库`Settings → Pages → Source`选择`GitHub Actions`。首次启用
 - [本版最终处理口径](./04_本版计分口径.md)
 - [部署与使用说明](./部署与使用说明.md)
 - [测试说明](./测试说明.md)
-- [已核验的部署结果](./部署结果.md)
+- [原账号历史部署结果](./部署结果.md)
+- [当前仓库迁移与首次发布](./迁移部署说明.md)
 
 ## 技术结构
 
