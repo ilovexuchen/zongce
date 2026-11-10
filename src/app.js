@@ -151,7 +151,7 @@ async function submitSettings(form){
     // 年度否决状态不跨学年继承；旧学年的状态保存在年度配置中。
     next.settings.years={...(next.settings.years||{}),[oldYear]:{grade:state.settings.grade,startDate:state.settings.startDate,endDate:state.settings.endDate,rangeConfirmed:state.settings.rangeConfirmed,academicMisconduct:state.settings.academicMisconduct,conductViolation:state.settings.conductViolation,hygieneFailures:state.settings.hygieneFailures}};
     const saved=next.settings.years[year];
-    if(saved)Object.assign(next.settings,saved);
+    if(saved)for(const key of ['grade','startDate','endDate','rangeConfirmed','academicMisconduct','conductViolation','hygieneFailures'])next.settings[key]=saved[key];
     else{
       const y=Number(year.slice(0,4));Object.assign(next.settings,{grade:'',startDate:`${y}-09-01`,endDate:`${y+1}-08-31`,rangeConfirmed:false,academicMisconduct:'unknown',conductViolation:'unknown',hygieneFailures:null});
     }

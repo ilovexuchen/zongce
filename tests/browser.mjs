@@ -6,8 +6,8 @@ import assert from 'node:assert/strict';
 import {createServer} from '../tools/serve.mjs';
 const folder=path.resolve('test-results');await mkdir(folder,{recursive:true});
 const executable=process.env.BROWSER_PATH||(['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',chromium.executablePath()].find(existsSync));
-const server=createServer(0);await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));
-const base=`http://127.0.0.1:${server.address().port}`;
+const server=process.env.PLANNER_URL?null:createServer(0);if(server)await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));
+const base=process.env.PLANNER_URL?process.env.PLANNER_URL.replace(/\/$/,''):`http://127.0.0.1:${server.address().port}`;
 const browser=await chromium.launch({headless:true,...(executable?{executablePath:executable}:{})});
 const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,acceptDownloads:true});
 await context.addInitScript(()=>{Object.defineProperty(window,'showDirectoryPicker',{value:undefined,configurable:true});Object.defineProperty(window,'showSaveFilePicker',{value:undefined,configurable:true});});
@@ -46,7 +46,7 @@ try{
     });assert.equal(write,'directory');await dirPage.reload();await dirPage.locator('[data-storage-status]').waitFor();await dirPage.waitForFunction(()=>document.querySelector('[data-storage-status]').textContent.includes('已从目录恢复'));await dirPage.goto(base+'/#/records');assert.equal(await dirPage.locator('.record-card').count(),1);
   });
   await dirContext.close();
-  await writeFile(path.join(folder,'browser-report.json'),JSON.stringify({checks:checks.length,passed:checks,errors,externalRequests:external,androidRealDevice:false,nativeDirectoryTest:'Chromium OPFS原生句柄；选择器由测试替换，非安卓真机授权'},null,2));
+  await writeFile(path.join(folder,process.env.PLANNER_URL?'production-browser-report.json':'browser-report.json'),JSON.stringify({target:base,checks:checks.length,passed:checks,errors,externalRequests:external,androidRealDevice:false,nativeDirectoryTest:'Chromium OPFS原生句柄；选择器由测试替换，非安卓真机授权'},null,2));
   console.log(JSON.stringify({browserChecks:checks.length,passed:true,screenshots:folder},null,2));
 }catch(error){await page.screenshot({path:path.join(folder,'failure.png'),fullPage:true}).catch(()=>{});await writeFile(path.join(folder,'failure.txt'),error.stack||String(error));throw error;}
-finally{await browser.close();server.close();}
+finally{await browser.close();server?.close();}

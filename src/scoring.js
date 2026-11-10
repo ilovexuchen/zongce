@@ -127,7 +127,7 @@ function evaluate(record, rule, state) {
         const role=choice('role','本人角色',['leader','member']);
         const roleCoefficient=tier==='national'?(a===0||role==='leader'?1:.8):1;
         out.value*=state.settings.policies.teamCoefficients==='override'&&tier==='national'?roleCoefficient:rankCoefficient*roleCoefficient;
-        note(`团体折算：排名${rankCoefficient} × 角色${roleCoefficient}（规划口径）`);
+        note(state.settings.policies.teamCoefficients==='override'&&tier==='national'?`团体折算：国家级角色系数${roleCoefficient}覆盖排名系数（个人改选）`:`团体折算：排名${rankCoefficient} × 角色${roleCoefficient}（规划口径）`);
       }
       out.priority=(levelOrder[tier]||0)*100+3-a;
       break;

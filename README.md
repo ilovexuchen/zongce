@@ -4,6 +4,10 @@
 
 **活动、评分、目录授权和证据照片留在本机；GitHub只托管程序与公开规则资料。分数为预估，最终以学院认定为准。**
 
+- 在线使用：https://genshinstartmoonlight.github.io/zongce-planner/
+- 源码仓库：https://github.com/genshinstartmoonlight/zongce-planner
+- 部署记录：https://github.com/genshinstartmoonlight/zongce-planner/actions
+
 ## 使用
 
 1. 打开部署后的HTTPS网址，先在“设置”核对学年、年级、起止日期。
