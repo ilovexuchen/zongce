@@ -46,6 +46,10 @@ try{
     });assert.equal(write,'directory');await dirPage.reload();await dirPage.locator('[data-storage-status]').waitFor();await dirPage.waitForFunction(()=>document.querySelector('[data-storage-status]').textContent.includes('已从目录恢复'));await dirPage.goto(base+'/#/records');assert.equal(await dirPage.locator('.record-card').count(),1);
   });
   await dirContext.close();
+  await run('真实IndexedDB并发事务：同一旧版本只能有一方提交成功',async()=>{
+    const outcomes=await page.evaluate(async()=>{const {LocalDB}=await import('./src/storage-db.js');const db1=await new LocalDB().open(),db2=await new LocalDB().open(),old=await db1.get('state');const a=structuredClone(old),b=structuredClone(old);a.revision=crypto.randomUUID();b.revision=crypto.randomUUID();const results=await Promise.allSettled([db1.save(a,[],old.revision),db2.save(b,[],old.revision)]);return results.map(r=>r.status).sort();});
+    assert.deepEqual(outcomes,['fulfilled','rejected']);
+  });
   await writeFile(path.join(folder,process.env.PLANNER_URL?'production-browser-report.json':'browser-report.json'),JSON.stringify({target:base,checks:checks.length,passed:checks,errors,externalRequests:external,androidRealDevice:false,nativeDirectoryTest:'Chromium OPFS原生句柄；选择器由测试替换，非安卓真机授权'},null,2));
   console.log(JSON.stringify({browserChecks:checks.length,passed:true,screenshots:folder},null,2));
 }catch(error){await page.screenshot({path:path.join(folder,'failure.png'),fullPage:true}).catch(()=>{});await writeFile(path.join(folder,'failure.txt'),error.stack||String(error));throw error;}

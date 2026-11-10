@@ -83,7 +83,7 @@ export class Storage {
         if(pending){this.status('pending','有尚未写入目录的浏览器暂存修改，请点击重试保存');return state;}
         const found=await readDirectory(this.root,this.ruleIds,message=>this.status('busy',message));
         if(!found)throw new Error('已连接目录缺少资料，请重新授权或从备份恢复');
-        state=found.state;await this.db.save(state,found.photos);this.localRevision=state.revision;this.expected=found.pointer;this.recoveryPointerHash=found.pointerHash;
+        state=found.state;await this.db.save(state,found.photos,stored?.revision||null);this.localRevision=state.revision;this.expected=found.pointer;this.recoveryPointerHash=found.pointerHash;
         await this.persistPrefs();
         this.status(found.recovered?'pending':'directory',found.recovered?'已恢复完整快照，请重试提交目录指针':`已从目录恢复 · ${this.handle.name}`,{time:state.updatedAt});
       }catch(e){this.status('error',`目录读取失败：${e.message}；浏览器暂存资料仍保留`);}
@@ -101,7 +101,7 @@ export class Storage {
       const action=await chooseExisting(found.state,state);
       if(action==='cancel')return {state,cancelled:true};
       await this.db.recovery(state);
-      if(action==='load'){state=found.state;await this.db.save(state,found.photos);this.localRevision=state.revision;}
+      if(action==='load'){state=found.state;await this.db.save(state,found.photos,this.localRevision||null);this.localRevision=state.revision;}
       this.expected=found.pointer;this.recoveryPointerHash=found.pointerHash;
     }else this.expected=null;
     this.handle=handle;this.root=root;this.mode='directory';
@@ -131,7 +131,7 @@ export class Storage {
     for(const p of newPhotos)validateEvidence(p);
     const photos=[];
     for(const id of ids){const p=fresh.get(id)||await this.db.photo(id);if(!p?.blob||p.blob.size!==p.size)throw new Error('有证据照片尚未持久保存，请重新选择或恢复备份');photos.push(p);}
-    try{await this.db.save(state,newPhotos);this.localRevision=state.revision;}catch(e){this.status('error',`保存失败：${e.name||e.message}。浏览器配额可能不足，请立即备份或减少照片。`);throw e;}
+    try{await this.db.save(state,newPhotos,this.localRevision||null);this.localRevision=state.revision;}catch(e){this.status('error',`浏览器未保存：${e.message||e.name}。如为配额不足请先备份；如为版本冲突请刷新。`);throw e;}
     if(this.mode!=='directory'){this.status('browser','已保存到本机浏览器',{time:state.updatedAt});return {destination:'browser'};}
     try{
       if(!this.root||!this.handle||await this.handle.queryPermission({mode:'readwrite'})!=='granted')throw new Error('目录权限失效，请重新授权');

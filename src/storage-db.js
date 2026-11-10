@@ -14,12 +14,16 @@ export class LocalDB {
   async set(key,value){const tx=this.db.transaction('meta','readwrite');const done=finished(tx);tx.objectStore('meta').put(value,key);await done;}
   async photo(id){return request(this.db.transaction('photos').objectStore('photos').get(id));}
   async photos(ids){const values=[];for(const id of [...new Set(ids)]){const p=await this.photo(id);if(!p?.blob||p.blob.size!==p.size)throw new Error(`证据照片缺失：${id}。请恢复完整备份，不能把缺图资料当完整资料保存。`);values.push(p);}return values;}
-  async save(state,photos=[]){
+  async save(state,photos=[],expectedRevision=undefined){
     const tx=this.db.transaction(['meta','photos'],'readwrite');
     const done=finished(tx);
-    for(const p of photos)tx.objectStore('photos').put(p);
-    tx.objectStore('meta').put(state,'state');
-    await done;
+    let conflict=null;
+    const write=()=>{for(const p of photos)tx.objectStore('photos').put(p);tx.objectStore('meta').put(state,'state');};
+    if(expectedRevision!==undefined){
+      const req=tx.objectStore('meta').get('state');
+      req.onsuccess=()=>{if((req.result?.revision||null)!==expectedRevision){conflict=new Error('另一标签页已保存新版本，未覆盖资料，请刷新后继续');tx.abort();}else write();};
+    }else write();
+    try{await done;}catch(e){throw conflict||e;}
   }
   async recovery(state){
     const tx=this.db.transaction('recovery','readwrite');const done=finished(tx);

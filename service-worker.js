@@ -1,4 +1,4 @@
-const CACHE='zongce-app-v1-20261110-2';
+const CACHE='zongce-app-v1-20261110-3';
 const BASE=new URL('./',self.location.href);
 const FILES=['./','index.html','styles.css','manifest.webmanifest','assets/icon.svg','assets/icon-192.png','assets/icon-512.png','src/app.js','src/model.js','src/rules.js','src/rules-data.json','src/scoring.js','src/forms.js','src/views.js','src/storage-db.js','src/storage-directory.js','src/backup.js','资料/综测_原始依据.pdf'];
 const ALLOWED=new Set(FILES.map(p=>new URL(p,BASE).pathname));
