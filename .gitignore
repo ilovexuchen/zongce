@@ -1,0 +1,13 @@
+node_modules/
+test-results/
+playwright-report/
+*.log
+*.zip
+*.doc
+*.docx
+~$*
+综测规划数据/
+evidence/
+snapshots/
+.env*
+.DS_Store

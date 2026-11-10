@@ -1,0 +1,43 @@
+name: Verify and deploy planner
+on:
+  push:
+    branches: [codex/zongce-planner]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  verify-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Scoring, backup and file persistence tests
+        run: npm test
+      - uses: actions/configure-pages@v5
+      - name: Stage only public application files
+        run: |
+          mkdir -p _site/资料
+          cp index.html styles.css service-worker.js manifest.webmanifest _site/
+          cp -r src assets _site/
+          cp 资料/综测_原始依据.pdf _site/资料/
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+  deploy:
+    needs: verify-build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

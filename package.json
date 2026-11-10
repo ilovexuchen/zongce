@@ -1,0 +1,15 @@
+{
+  "name": "zongce-planner",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "仅在本机保存数据与证据的五育素质评价规划网页",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "node tests/browser.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0"
+  }
+}
